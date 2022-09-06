@@ -14,16 +14,39 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        let container = DIContainer()
-        container.append(framework: ApplicationDependency.self)
-        
         let window = UIWindow(windowScene: windowScene)
-        let rootViewController: FirstViewController = container.resolve()
-        window.rootViewController = rootViewController
+        
+//        let router = Router()
+//        let viewModel = ViewModel(router: router)
+//        let controller = ViewController(viewModel: viewModel)
+//        router.viewController = controller
+        
+        let container = DIContainer()
+        test(container: container)
+//        container.append(framework: ApplicationDependency.self)
+        
+        let controller: ViewController = container.resolve()
+        
+//        print(ApplicationDependency.container.makeGraph())
+        
+        window.rootViewController = controller
         window.makeKeyAndVisible()
         self.window = window
     }
 
+    func test(container: DIContainer) {
+        container.register(ViewController.init)
+            .as(ViewControllerTag.self)
+//            .lifetime(.objectGraph)
+        
+        container.register(Router.init)
+            .as(RouterProtocol.self)
+            .injection(cycle: true, \.viewController)
+        
+        container.register(ViewModel.init)
+            .as(ViewModelProtocol.self)
+    }
+    
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.
